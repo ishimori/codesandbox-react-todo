@@ -1,37 +1,56 @@
-import React from "react";
+import React, { useState } from "react";
 import "./styles.css";
+import InputTodo from "./components/InputTodo";
+import { UncompleteTodos } from "./components/UncompleteTodos";
+import { CompleteTodos } from "./components/CompleteTodos";
 
 export const App = () => {
+  const [uncompleteTodos, setUncompleteTodos] = useState([]);
+  const [completeTodos, setcompleteTodos] = useState([]);
+  const [todoText, setTodoText] = useState("");
+
+  const onChangeTodoText = (event) => setTodoText(event.target.value);
+  const onClickAdd = () => {
+    if (todoText === "") return;
+    const newTodos = [...uncompleteTodos, todoText];
+    setUncompleteTodos(newTodos);
+    setTodoText("");
+  };
+  const onClickDelete = (index) => {
+    const newTodos = [...uncompleteTodos];
+    newTodos.splice(index, 1); // 渡された要素から指定個数を削除
+    setUncompleteTodos(newTodos);
+  };
+
+  const onClickComplete = (index) => {
+    const newUnCompleteTodos = [...uncompleteTodos];
+    newUnCompleteTodos.splice(index, 1); // 渡された要素から指定個数を削除
+    const newCompleteTodos = [...completeTodos, uncompleteTodos[index]];
+
+    setUncompleteTodos(newUnCompleteTodos);
+    setcompleteTodos(newCompleteTodos);
+  };
+  const onClickBack = (index) => {
+    const newCompleteTodos = [...completeTodos];
+    newCompleteTodos.splice(index, 1);
+    const newUncompleteTodos = [...uncompleteTodos, newCompleteTodos[index]];
+
+    setcompleteTodos(newCompleteTodos);
+    setUncompleteTodos(newUncompleteTodos);
+  };
   return (
     <>
-      <div>
-        <input placeholder="TODOを入力" />
-        <button>追加</button>
-      </div>
-      <div>
-        <p>未完了のTODO</p>
-        <ul>
-          <div>
-            <li>ああああ</li>
-            <button>完了</button>
-            <button>削除</button>
-          </div>
-          <div>
-            <li>いいいい</li>
-            <button>完了</button>
-            <button>削除</button>
-          </div>
-        </ul>
-      </div>
-      <div>
-        <p>完了のTODO</p>
-        <ul>
-          <div>
-            <li>うううう</li>
-            <button>戻す</button>
-          </div>
-        </ul>
-      </div>
+      <InputTodo
+        todoText={todoText}
+        onChange={onChangeTodoText}
+        onClick={onClickAdd}
+      />
+      <UncompleteTodos
+        todos={uncompleteTodos}
+        onClickComplete={onClickComplete}
+        onClickDelete={onClickDelete}
+      />
+      <CompleteTodos todos={completeTodos} onClickBack={onClickBack} />
     </>
   );
 };
